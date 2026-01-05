@@ -3,22 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Celebration</title>
+    <title>Celebration | Anagha</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Dancing+Script:wght@700&display=swap');
-        body { background: #fff5f6; overflow: hidden; text-align: center; }
-        .bouncy-btn { width: 200px; height: 200px; background: white; border: 5px solid #ffafcc; border-radius: 50%; font-family: 'Gaegu', cursive; font-size: 1.5rem; color: #ff4d6d; box-shadow: 0 10px 0 #ffafcc; cursor: pointer; }
-        .bouncy-btn:active { transform: translateY(5px); box-shadow: 0 5px 0 #ffafcc; }
+        body { background: #fff5f6; overflow: hidden; text-align: center; font-family: 'Quicksand', sans-serif; }
+        .bouncy-btn { width: 200px; height: 200px; background: white; border: 5px solid #ffafcc; border-radius: 50%; font-family: 'Gaegu', cursive; font-size: 1.5rem; color: #ff4d6d; box-shadow: 0 10px 0 #ffafcc; cursor: pointer; transition: all 0.2s; }
         .handwritten { font-family: 'Dancing Script', cursive; font-size: 3.5rem; color: #ff4d6d; }
+        
+        /* Fallback Music Button */
+        #musicFallback {
+            position: fixed; top: 20px; right: 20px; z-index: 100;
+            background: white; border: 2px solid #ffafcc; padding: 8px 15px;
+            border-radius: 20px; color: #ff8fab; font-size: 12px; font-weight: bold;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center h-screen">
+
+    <audio id="celebrationSong" loop>
+        <source src="birthday-song.mp3" type="audio/mpeg">
+    </audio>
+
+    <button id="musicFallback" onclick="toggleMusic()">🎵 Play Music</button>
     
     <div id="celebration-ui">
-        <p class="text-pink-400 mb-6 uppercase tracking-widest text-xs">Ready? Press and hold!</p>
+        <p class="text-pink-400 mb-6 uppercase tracking-widest text-xs">Almost there!</p>
         <button id="giftBtn" class="bouncy-btn">Press & Hold! ❤️</button>
     </div>
 
@@ -28,11 +40,36 @@
     </div>
 
     <script>
+        const song = document.getElementById('celebrationSong');
+        const btn = document.getElementById('giftBtn');
+        const fallbackBtn = document.getElementById('musicFallback');
         let pressTimer;
         let p = 0;
-        const btn = document.getElementById('giftBtn');
 
-        btn.onmousedown = btn.ontouchstart = () => {
+        // 1. AUTOPLAY TRIGGER
+        window.addEventListener('DOMContentLoaded', () => {
+            const playPromise = song.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Autoplay worked!
+                    fallbackBtn.style.display = 'none';
+                }).catch(() => {
+                    // Autoplay blocked - show manual button
+                    fallbackBtn.style.display = 'block';
+                });
+            }
+        });
+
+        function toggleMusic() {
+            song.play();
+            fallbackBtn.style.display = 'none';
+        }
+
+        // 2. PRESS & HOLD LOGIC
+        btn.onmousedown = btn.ontouchstart = (e) => {
+            e.preventDefault();
+            if (song.paused) toggleMusic(); // Extra safety to start music
+            
             pressTimer = setInterval(() => {
                 p += 2;
                 btn.style.background = `linear-gradient(to top, #ffafcc ${p}%, white ${p}%)`;
@@ -50,11 +87,10 @@
             clearInterval(pressTimer);
             document.getElementById('celebration-ui').style.display = 'none';
             document.getElementById('final').classList.remove('hidden');
-
-            confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 }, colors: ['#ffafcc', '#ff4d6d', '#ffffff'] });
-
+            confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 }, colors: ['#ffafcc', '#ff4d6d'] });
             gsap.to("#nameTag", { opacity: 1, y: -20, duration: 2, delay: 0.5 });
         }
     </script>
 </body>
 </html>
+
