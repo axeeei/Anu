@@ -35,18 +35,39 @@
 
     <script>
         const cursor = document.querySelector("#cursor");
+        const music = document.getElementById('bdaySong');
+        
+        // Custom Cursor Movement
         window.addEventListener("mousemove", (e) => gsap.to(cursor, {x: e.clientX, y: e.clientY, duration: 0.1}));
 
         document.getElementById('letterBtn').addEventListener('click', () => {
-            // Start Music
-            document.getElementById('bdaySong').play();
+            // 1. Start Music and save progress to localStorage
+            music.play();
             
-            // Animation
+            // Periodically save the current time so home.html can pick it up
+            const saveInterval = setInterval(() => {
+                localStorage.setItem('musicTime', music.currentTime);
+            }, 100);
+
+            // 2. Animations
             gsap.to("#flap", { rotationX: 180, duration: 0.5 });
-            gsap.to("#wrapper", { scale: 0.8, opacity: 0, delay: 0.5, duration: 0.8, onComplete: () => {
-                window.location.href = "home.html";
-            }});
+            gsap.to("#wrapper", { 
+                scale: 0.8, 
+                opacity: 0, 
+                delay: 0.5, 
+                duration: 0.8, 
+                onComplete: () => {
+                    window.location.href = "home.html";
+                }
+            });
         });
+
+        // Ensure state is reset if she comes back to the start
+        window.onload = () => {
+            localStorage.removeItem('musicTime');
+            localStorage.removeItem('musicPausedAt');
+        };
     </script>
 </body>
 </html>
+
