@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,13 +13,7 @@
         body { background: #fff5f6; overflow: hidden; text-align: center; font-family: 'Quicksand', sans-serif; }
         .bouncy-btn { width: 200px; height: 200px; background: white; border: 5px solid #ffafcc; border-radius: 50%; font-family: 'Gaegu', cursive; font-size: 1.5rem; color: #ff4d6d; box-shadow: 0 10px 0 #ffafcc; cursor: pointer; transition: all 0.2s; }
         .handwritten { font-family: 'Dancing Script', cursive; font-size: 3.5rem; color: #ff4d6d; }
-        
-        /* Fallback Music Button */
-        #musicFallback {
-            position: fixed; top: 20px; right: 20px; z-index: 100;
-            background: white; border: 2px solid #ffafcc; padding: 8px 15px;
-            border-radius: 20px; color: #ff8fab; font-size: 12px; font-weight: bold;
-        }
+        #musicFallback { position: fixed; top: 20px; right: 20px; z-index: 100; background: white; border: 2px solid #ffafcc; padding: 8px 15px; border-radius: 20px; color: #ff8fab; font-size: 12px; font-weight: bold; display: none; }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center h-screen">
@@ -43,33 +38,19 @@
         const song = document.getElementById('celebrationSong');
         const btn = document.getElementById('giftBtn');
         const fallbackBtn = document.getElementById('musicFallback');
-        let pressTimer;
-        let p = 0;
+        let pressTimer, p = 0;
 
-        // 1. AUTOPLAY TRIGGER
-        window.addEventListener('DOMContentLoaded', () => {
-            const playPromise = song.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    // Autoplay worked!
-                    fallbackBtn.style.display = 'none';
-                }).catch(() => {
-                    // Autoplay blocked - show manual button
-                    fallbackBtn.style.display = 'block';
-                });
-            }
+        window.addEventListener('load', () => {
+            const pauseTime = localStorage.getItem('musicPausedAt');
+            if (pauseTime) song.currentTime = parseFloat(pauseTime);
+            song.play().catch(() => fallbackBtn.style.display = 'block');
         });
 
-        function toggleMusic() {
-            song.play();
-            fallbackBtn.style.display = 'none';
-        }
+        function toggleMusic() { song.play(); fallbackBtn.style.display = 'none'; }
 
-        // 2. PRESS & HOLD LOGIC
         btn.onmousedown = btn.ontouchstart = (e) => {
             e.preventDefault();
-            if (song.paused) toggleMusic(); // Extra safety to start music
-            
+            if (song.paused) toggleMusic();
             pressTimer = setInterval(() => {
                 p += 2;
                 btn.style.background = `linear-gradient(to top, #ffafcc ${p}%, white ${p}%)`;
@@ -77,18 +58,14 @@
             }, 30);
         };
 
-        window.onmouseup = window.ontouchend = () => {
-            clearInterval(pressTimer);
-            p = 0;
-            btn.style.background = "white";
-        };
+        window.onmouseup = window.ontouchend = () => { clearInterval(pressTimer); p = 0; btn.style.background = "white"; };
 
         function finish() {
-            clearInterval(pressTimer);
             document.getElementById('celebration-ui').style.display = 'none';
             document.getElementById('final').classList.remove('hidden');
             confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 }, colors: ['#ffafcc', '#ff4d6d'] });
             gsap.to("#nameTag", { opacity: 1, y: -20, duration: 2, delay: 0.5 });
+            localStorage.clear();
         }
     </script>
 </body>
