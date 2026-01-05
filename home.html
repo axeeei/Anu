@@ -18,8 +18,11 @@
 <body>
     <div id="cursor"></div>
 
+    <audio id="bgMusic" loop>
+        <source src="birthday-song.mp3" type="audio/mpeg">
+    </audio>
+
     <main class="max-w-2xl mx-auto px-6 py-24 text-center">
-        
         <div class="memory-section opacity-0 translate-y-10 mb-32">
             <h2 class="memory-font text-5xl text-pink-500 mb-8">Remember this?</h2>
             <p class="text-xl leading-relaxed">
@@ -52,7 +55,6 @@
                 Happy Birthday, Anagha. <br>
                 Stay as wonderful as you are.
             </p>
-            
             <div class="mt-16 flex flex-col items-center gap-4">
                 <a href="gallery.html" class="px-12 py-4 bg-pink-400 text-white rounded-full font-bold shadow-lg hover:bg-pink-500 transition-all no-underline scale-100 hover:scale-105 active:scale-95">
                     Open the Photo Gallery 📸
@@ -60,31 +62,35 @@
                 <p class="text-[10px] opacity-40 uppercase tracking-tighter">Something small, from Farzan</p>
             </div>
         </div>
-
     </main>
 
     <script>
         gsap.registerPlugin(ScrollTrigger);
-        
-        // Custom Cursor Movement
-        window.addEventListener("mousemove", (e) => {
-            gsap.to("#cursor", { x: e.clientX, y: e.clientY, duration: 0.1 });
+        const music = document.getElementById('bgMusic');
+
+        // Resume music from localStorage
+        window.addEventListener('load', () => {
+            const savedTime = localStorage.getItem('musicTime');
+            if (savedTime) music.currentTime = parseFloat(savedTime);
+            music.play().catch(() => {
+                window.addEventListener('scroll', () => music.play(), { once: true });
+            });
         });
 
-        // Smooth Scroll Reveal Logic
+        // Save progress constantly
+        setInterval(() => {
+            if (!music.paused) localStorage.setItem('musicTime', music.currentTime);
+        }, 100);
+
+        window.addEventListener("mousemove", (e) => gsap.to("#cursor", { x: e.clientX, y: e.clientY, duration: 0.1 }));
+
         gsap.utils.toArray(".memory-section").forEach(section => {
             gsap.to(section, {
-                scrollTrigger: {
-                    trigger: section,
-                    start: "top 80%",
-                    toggleActions: "play none none none"
-                },
-                opacity: 1,
-                y: 0,
-                duration: 1.2,
-                ease: "power2.out"
+                scrollTrigger: { trigger: section, start: "top 80%" },
+                opacity: 1, y: 0, duration: 1.2, ease: "power2.out"
             });
         });
     </script>
 </body>
 </html>
+
