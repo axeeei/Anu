@@ -9,7 +9,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Quicksand:wght@500&display=swap" rel="stylesheet">
     <style>
-        body { background: #fff5f6; font-family: 'Quicksand', sans-serif; overflow-x: hidden; }
+        /* Start hidden for the fade-in effect */
+        body { background: #fff5f6; font-family: 'Quicksand', sans-serif; overflow-x: hidden; opacity: 0; }
+        
         #cursor { width: 15px; height: 15px; background: #ffafcc; border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; mix-blend-mode: multiply; }
         .polaroid { background: white; padding: 15px 15px 45px 15px; box-shadow: 0 10px 30px rgba(255,175,204,0.2); transform: rotate(var(--r)); transition: all 0.4s ease; border: 1px solid #ffe5ec; }
         .polaroid img { width: 100%; height: 280px; object-fit: cover; }
@@ -38,14 +40,16 @@
 
     <script>
         gsap.registerPlugin(ScrollTrigger);
+
+        // --- NEW: SMOOTH ENTRY SCRIPT ---
+        window.addEventListener('load', () => {
+            gsap.to("body", { opacity: 1, duration: 1.5, ease: "power2.out" });
+            localStorage.setItem('musicPausedAt', localStorage.getItem('musicTime'));
+        });
+
         window.addEventListener("mousemove", (e) => gsap.to("#cursor", { x: e.clientX, y: e.clientY, duration: 0.1 }));
 
         const video = document.getElementById('birthdayVideo');
-
-        // Store the current music time and don't play bg music here
-        window.addEventListener('load', () => {
-            localStorage.setItem('musicPausedAt', localStorage.getItem('musicTime'));
-        });
 
         ScrollTrigger.create({
             trigger: "#birthdayVideo",
@@ -54,7 +58,7 @@
         });
 
         video.onended = () => {
-            gsap.to("body", { opacity: 0, duration: 1, onComplete: () => {
+            gsap.to("body", { opacity: 0, duration: 1.5, onComplete: () => {
                 window.location.href = "final.html"; 
             }});
         };
