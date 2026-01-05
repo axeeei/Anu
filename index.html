@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Letter for Anagha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Quicksand:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body { background: #fff5f6; font-family: 'Quicksand', sans-serif; overflow: hidden; cursor: none; }
+        #cursor { width: 20px; height: 20px; background: #ffafcc; border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; mix-blend-mode: multiply; }
+        .envelope { width: 300px; height: 200px; background: #fff; border: 2px solid #ffafcc; position: relative; cursor: pointer; transition: transform 0.5s; box-shadow: 0 15px 35px rgba(255,175,204,0.3); }
+        .envelope-flap { position: absolute; top: 0; left: 0; width: 0; height: 0; border-left: 150px solid transparent; border-right: 150px solid transparent; border-top: 100px solid #ffc1cc; transition: transform 0.5s; transform-origin: top; }
+        .hero-font { font-family: 'Gaegu', cursive; color: #ff4d6d; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center h-screen">
+    <div id="cursor"></div>
+    
+    <div id="wrapper" class="text-center">
+        <p class="mb-8 text-pink-400 tracking-widest text-sm">Hey Anagha, you have mail!</p>
+        
+        <div class="envelope mx-auto flex items-center justify-center" id="letterBtn">
+            <div class="envelope-flap" id="flap"></div>
+            <span class="text-pink-300 font-bold">Open Me</span>
+        </div>
+
+        <p class="mt-12 opacity-40 text-xs italic">A little something from Farzan</p>
+    </div>
+
+    <audio id="bdaySong" loop>
+        <source src="birthday-song.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const cursor = document.querySelector("#cursor");
+        window.addEventListener("mousemove", (e) => gsap.to(cursor, {x: e.clientX, y: e.clientY, duration: 0.1}));
+
+        document.getElementById('letterBtn').addEventListener('click', () => {
+            // Start Music
+            document.getElementById('bdaySong').play();
+            
+            // Animation
+            gsap.to("#flap", { rotationX: 180, duration: 0.5 });
+            gsap.to("#wrapper", { scale: 0.8, opacity: 0, delay: 0.5, duration: 0.8, onComplete: () => {
+                window.location.href = "home.html";
+            }});
+        });
+    </script>
+</body>
+</html>
